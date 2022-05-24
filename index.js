@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const app = express();
+require('dotenv').config()
 
 //requireing http and socket.io dependencies
 const http = require("http").Server(app);
@@ -18,8 +19,7 @@ app.use(express.json());
 
 var Message = mongoose.model("Message", { name: String, message: String });
 
-const dbUrl =
-  "mongodb+srv://adarshnd:adarsh14@adiclustur.rso1k.mongodb.net/websocket?retryWrites=true&w=majority";
+const dbUrl = process.env.DBURL
 
 app.get("/messages", async (req, res) => {
   const messageData = await Message.find().lean();
@@ -29,15 +29,15 @@ app.get("/messages", async (req, res) => {
 app.post("/messages", async (req, res) => {
   var message = new Message(req.body);
   await message.save();
-  
+
   //
-  io.emit('message',req.body)
+  io.emit('message', req.body)
   res.send(message);
 });
 
 
-io.on('connection',()=>{
-    console.log('User Connected');
+io.on('connection', () => {
+  console.log('User Connected');
 })
 
 mongoose.connect(
@@ -57,5 +57,5 @@ mongoose.connect(
 );
 
 http.listen(port, () => {
-    console.log(`Server Listeningf at ${port} `);
-  });
+  console.log(`Server Listeningf at ${port} `);
+});
